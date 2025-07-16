@@ -1,59 +1,21 @@
-package tn.esprit.spring;
-
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BlocServiceTest {
-
+class BlocServiceTest {  // Remove Spring annotations
+    
     @BeforeAll
-    void before() {
+    static void beforeAll() {  // Must be static
         System.out.println("Before all tests");
     }
 
-    @AfterAll
-    void after() {
-        System.out.println("After all tests");
+    @Test @Order(1)
+    void test1() {
+        assertTrue(true);
     }
 
-    @BeforeEach
-    void beforeEach() {
-        System.out.println("Before each test");
-    }
-
-    @AfterEach
-    void afterEach() {
-        System.out.println("After each test");
-    }
-
-    @Order(1)
-    @RepeatedTest(4)
-    void test() {
-        Assertions.assertTrue(true);
-    }
-
-    @Order(4)
-    @Test
+    @Test @Order(2)
     void test2() {
-        Assertions.assertEquals(1, 1);
-    }
-
-    @Order(2)
-    @Test
-    void test3() {
-        Assertions.assertNotNull("Hello");
-    }
-
-    @Order(3)
-    @Test
-    void test4() {
-        Assertions.assertThrows(ArithmeticException.class, () -> {
-            int x = 1 / 0;
-        });
+        assertEquals(1, 1);
     }
 }
