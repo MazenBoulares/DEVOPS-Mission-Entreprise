@@ -78,7 +78,7 @@
     <distributionManagement>
     <repository>
         <id>nexus</id>
-        <url>ttp://localhost:8081/repository/mazen-maven-releases/</url>
+        <url>http://localhost:8081/repository/mazen-maven-releases/</url>
     </repository>
 </distributionManagement>
 
