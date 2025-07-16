@@ -76,13 +76,10 @@
     </build>
 <!-- ===== ADDED THIS SECTION FOR NEXUS DEPLOYMENT ===== -->
     <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>http://your-nexus-server:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-releases</id>
-            <url>http://your-nexus-server:8081/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
+    <repository>
+        <id>nexus</id>
+        <url>ttp://localhost:8081/repository/mazen-maven-releases/</url>
+    </repository>
+</distributionManagement>
+
 </project>
