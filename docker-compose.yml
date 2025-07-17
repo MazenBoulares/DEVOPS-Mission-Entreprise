@@ -5,5 +5,5 @@ services:
     image: my-local-image:latest
     container_name: springboot-app
     ports:
-      - "8086:8086"  # Expose 8086 inside container on port 8086 externally 
+      - "8085:8086"  # Expose 8086 inside container on port 8085 externally 
     restart: unless-stopped
