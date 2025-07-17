@@ -1,9 +1,30 @@
 version: '3.8'
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_DATABASE: foyer
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: unless-stopped
+
   app:
     image: my-local-image:latest
     container_name: springboot-app
+    depends_on:
+      - db
     ports:
-      - "8085:8086"  # Expose 8086 inside container on port 8085 externally 
+      - "8085:8086"  # Spring Boot runs on 8086, 8085 is accessed externally
     restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/foyer?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+volumes:
+  db-data:
