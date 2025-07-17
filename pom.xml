@@ -74,12 +74,11 @@
             </plugin>
         </plugins>
     </build>
-<!-- ===== ADDED THIS SECTION FOR NEXUS DEPLOYMENT ===== -->
-    <distributionManagement>
-    <repository>
-        <id>nexus</id>
-        <url>http://localhost:8081/repository/mazen-maven-releases/</url>
-    </repository>
-</distributionManagement>
+     <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>http://localhost:8081/repository/mazen-maven-releases/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
