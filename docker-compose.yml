@@ -5,5 +5,26 @@ services:
     image: my-local-image:latest
     container_name: springboot-app
     ports:
-      - "8085:8086"  # Expose 8086 inside container on port 8085 externally 
+      - "8085:8086"  # External:Internal
     restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  grafana-storage:
