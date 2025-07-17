@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app:
+    image: my-local-image:latest
+    container_name: springboot-app
+    ports:
+      - "8085:8080"  # Expose 8080 inside container on port 8085 externally 
+    restart: unless-stopped
