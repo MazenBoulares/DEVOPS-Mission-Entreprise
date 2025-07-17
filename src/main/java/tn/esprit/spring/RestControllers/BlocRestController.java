@@ -1,66 +1,114 @@
 package tn.esprit.spring.RestControllers;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.spring.DAO.Entities.Bloc;
-import tn.esprit.spring.Services.Bloc.IBlocService;
+import tn.esprit.spring.DAO.Entities.Chambre;
+import tn.esprit.spring.DAO.Entities.Foyer;
+import tn.esprit.spring.DAO.Repositories.BlocRepository;
+import tn.esprit.spring.DAO.Repositories.ChambreRepository;
+import tn.esprit.spring.DAO.Repositories.FoyerRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("bloc")
-@AllArgsConstructor
+@RequestMapping("/bloc")
+@RequiredArgsConstructor
 public class BlocRestController {
-    IBlocService service;
 
-    @PostMapping("addOrUpdate")
-    Bloc addOrUpdate(@RequestBody Bloc b) {
-        return service.addOrUpdate(b);
+    private final BlocRepository blocRepository;
+    private final ChambreRepository chambreRepository;
+    private final FoyerRepository foyerRepository;
+
+    @PostMapping("/addOrUpdate")
+    public Bloc addOrUpdate(@RequestBody Bloc b) {
+        List<Chambre> chambres = b.getChambres();
+        b = blocRepository.save(b);
+        for (Chambre chambre : chambres) {
+            chambre.setBloc(b);
+            chambreRepository.save(chambre);
+        }
+        return b;
     }
 
-    @GetMapping("findAll")
-    List<Bloc> findAll() {
-        return service.findAll();
+    @GetMapping("/findAll")
+    public List<Bloc> findAll() {
+        return blocRepository.findAll();
     }
 
-    @GetMapping("findById")
-    Bloc findById(@RequestParam long id) {
-        return service.findById(id);
+    @GetMapping("/findById")
+    public Bloc findById(@RequestParam long id) {
+        return blocRepository.findById(id).orElse(null);
     }
 
-    @DeleteMapping("delete")
-    void delete(@RequestBody Bloc b) {
-        service.delete(b);
+    @DeleteMapping("/delete")
+    public String delete(@RequestBody Bloc b) {
+        chambreRepository.deleteAll(b.getChambres());
+        blocRepository.delete(b);
+        return "Deleted";
     }
 
-    @DeleteMapping("deleteById")
-    void deleteById(@RequestParam long id) {
-        service.deleteById(id);
+    @DeleteMapping("/deleteById")
+    public String deleteById(@RequestParam long id) {
+        Bloc b = blocRepository.findById(id).orElse(null);
+        if (b != null) {
+            chambreRepository.deleteAll(b.getChambres());
+            blocRepository.delete(b);
+            return "Deleted";
+        }
+        return "Not found";
     }
 
-    @PutMapping("affecterChambresABloc")
-    Bloc affecterChambresABloc(@RequestBody List<Long> numChambre, @RequestParam String nomBloc) {
-        return service.affecterChambresABloc(numChambre, nomBloc);
-    }
-    // ...............?nomFoyer=....&nomBloc=....
-    @PutMapping("affecterBlocAFoyer")
-    Bloc affecterBlocAFoyer(@RequestParam String nomBloc, @RequestParam String nomFoyer) {
-        return service.affecterBlocAFoyer(nomBloc, nomFoyer);
-    }
-
-    // .............../Foyer des jasmins/Bloc G
-    @PutMapping("affecterBlocAFoyer2/{nomFoyer}/{nomBloc}")
-    Bloc affecterBlocAFoyer2(@PathVariable String nomBloc, @PathVariable String nomFoyer) {
-        return service.affecterBlocAFoyer(nomBloc, nomFoyer);
+    @PutMapping("/affecterChambresABloc")
+    public Bloc affecterChambresABloc(@RequestBody List<Long> numChambre, @RequestParam String nomBloc) {
+        Bloc b = blocRepository.findByNomBloc(nomBloc);
+        if (b == null) return null;
+        for (Long num : numChambre) {
+            Chambre c = chambreRepository.findByNumeroChambre(num);
+            if (c != null) {
+                c.setBloc(b);
+                chambreRepository.save(c);
+            }
+        }
+        return b;
     }
 
-    @PostMapping("ajouterBlocEtSesChambres")
-    Bloc ajouterBlocEtSesChambres(@RequestBody Bloc b) {
-        return service.ajouterBlocEtSesChambres(b);
+    @PutMapping("/affecterBlocAFoyer")
+    public Bloc affecterBlocAFoyer(@RequestParam String nomBloc, @RequestParam String nomFoyer) {
+        Bloc b = blocRepository.findByNomBloc(nomBloc);
+        Foyer f = foyerRepository.findByNomFoyer(nomFoyer);
+        if (b == null || f == null) return null;
+        b.setFoyer(f);
+        return blocRepository.save(b);
     }
 
-    @PostMapping("ajouterBlocEtAffecterAFoyer/{nomF}")
-    Bloc ajouterBlocEtAffecterAFoyer(@RequestBody Bloc b,@PathVariable String nomF) {
-        return service.ajouterBlocEtAffecterAFoyer(b,nomF);
+    @PutMapping("/affecterBlocAFoyer2/{nomFoyer}/{nomBloc}")
+    public Bloc affecterBlocAFoyer2(@PathVariable String nomBloc, @PathVariable String nomFoyer) {
+        return affecterBlocAFoyer(nomBloc, nomFoyer);
+    }
+
+    @PostMapping("/ajouterBlocEtSesChambres")
+    public Bloc ajouterBlocEtSesChambres(@RequestBody Bloc b) {
+        List<Chambre> chambres = b.getChambres();
+        b = blocRepository.save(b);
+        for (Chambre c : chambres) {
+            c.setBloc(b);
+            chambreRepository.save(c);
+        }
+        return b;
+    }
+
+    @PostMapping("/ajouterBlocEtAffecterAFoyer/{nomF}")
+    public Bloc ajouterBlocEtAffecterAFoyer(@RequestBody Bloc b, @PathVariable String nomF) {
+        Foyer f = foyerRepository.findByNomFoyer(nomF);
+        if (f == null) return null;
+        b.setFoyer(f);
+        b = blocRepository.save(b);
+        for (Chambre c : b.getChambres()) {
+            c.setBloc(b);
+            chambreRepository.save(c);
+        }
+        return b;
     }
 }
